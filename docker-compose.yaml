@@ -12,9 +12,6 @@ services:
     volumes:
       - ./internal/db/dumps:/dumps
       - postgres_data:/var/lib/postgresql/data
-
-    ports:
-      - "5432:5432"
   
 #  migrator:
 #    container_name: migrator
@@ -29,7 +26,7 @@ services:
     container_name: stonks_runtime
     build: .
     ports:
-      - "5167:5167"
+      - "8084:5167"
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_URLS: "http://0.0.0.0:5167"
