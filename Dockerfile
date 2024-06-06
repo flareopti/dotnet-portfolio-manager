@@ -6,6 +6,7 @@ WORKDIR /source
 COPY api/. .
 RUN dotnet nuget locals --clear all
 RUN dotnet publish -c Development -a $TARGETARCH -o /app
+COPY api/api_keys.txt /app
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
