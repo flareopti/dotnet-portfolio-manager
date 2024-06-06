@@ -12,6 +12,7 @@ namespace api.Repository
     public class PortfolioRepository : IPortfolioRepository
     {
         private readonly ApplicationDBContext _context;
+
         public PortfolioRepository(ApplicationDBContext context)
         {
             _context = context;
@@ -26,8 +27,8 @@ namespace api.Repository
 
         public async Task<Portfolio> DeletePortfolio(AppUser appUser, string symbol)
         {
-            var portfolioModel = await _context.Portfolios.FirstOrDefaultAsync(x => x.AppUserId == appUser.Id && x.Stock.Symbol.ToLower() == symbol.ToLower());
-
+            var portfolioModel = await _context.Portfolios.FirstOrDefaultAsync(x =>
+                x.AppUserId == appUser.Id && x.Stock.Symbol.ToLower() == symbol.ToLower());
             if (portfolioModel == null)
             {
                 return null;
@@ -40,8 +41,7 @@ namespace api.Repository
 
         public async Task<List<Stock>> GetUserPortfolio(AppUser user)
         {
-            return await _context.Portfolios.Where(u => u.AppUserId == user.Id)
-            .Select(stock => new Stock
+            return await _context.Portfolios.Where(u => u.AppUserId == user.Id).Select(stock => new Stock
             {
                 Id = stock.StockId,
                 Symbol = stock.Stock.Symbol,

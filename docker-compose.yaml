@@ -15,6 +15,19 @@ services:
 
     ports:
       - "5432:5432"
+  
+  api:
+    container_name: stonks_runtime
+    build: .
+    ports:
+      - "5167:5167"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://0.0.0.0:5167"
+    depends_on:
+      - postgres_db
+    links:
+      - "postgres_db:db"
 
 volumes:
   postgres_data:
