@@ -7,10 +7,6 @@ COPY api/. .
 RUN dotnet nuget locals --clear all
 RUN dotnet publish -c Development -a $TARGETARCH -o /app
 
-RUN dotnet tool install --global dotnet-ef
-ENV PATH="${PATH}:/root/.dotnet/tools"
-RUN dotnet ef database update
-
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
 
@@ -26,5 +22,4 @@ RUN apk add --no-cache \
 WORKDIR /app
 COPY --from=build /app .
 # USER $APP_UID
-#ENTRYPOINT ["./api"]
-CMD ["./api"]
+ENTRYPOINT ["./api"]

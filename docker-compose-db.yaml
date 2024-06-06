@@ -1,0 +1,21 @@
+version: '3.9'
+name: stonks_db
+
+services:
+  postgres_db:
+    image: postgres
+
+    environment:
+      POSTGRES_DB: stonks
+      POSTGRES_PASSWORD: "qwerty"
+
+    volumes:
+      - ./internal/db/dumps:/dumps
+      - postgres_data:/var/lib/postgresql/data
+
+    ports:
+      - "5432:5432"
+      
+volumes:
+  postgres_data:
+

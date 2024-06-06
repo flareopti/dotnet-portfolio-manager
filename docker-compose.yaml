@@ -16,6 +16,15 @@ services:
     ports:
       - "5432:5432"
   
+  migrator:
+    container_name: migrator
+    build:
+      context: ./
+      dockerfile: migrator/Dockerfile
+    depends_on:
+      - postgres_db
+    links:
+      - "postgres_db:db"
   api:
     container_name: stonks_runtime
     build: .
@@ -25,7 +34,7 @@ services:
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_URLS: "http://0.0.0.0:5167"
     depends_on:
-      - postgres_db
+      - migrator
     links:
       - "postgres_db:db"
 

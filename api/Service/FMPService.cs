@@ -25,9 +25,13 @@ namespace api.Service
         {
             try
             {
+                var keyManager = new FMPConfigManager.KeyManager();
+                var key = keyManager.GetKey();
                 var result =
+                    // await _httpClient.GetAsync(
+                    //     $"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={_config["FMPKey"]}");
                     await _httpClient.GetAsync(
-                        $"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={_config["FMPKey"]}");
+                        $"https://financialmodelingprep.com/api/v3/profile/{symbol}?apikey={key}");
                 if (result.IsSuccessStatusCode)
                 {
                     var content = await result.Content.ReadAsStringAsync();

@@ -14,7 +14,6 @@ namespace api.Data
         // public ApplicationDBContext(DbContextOptions dbContextOptions)
         // : base(dbContextOptions)
         // {
-        //
         // }
         public ApplicationDBContext(IConfiguration configuration)
         {
