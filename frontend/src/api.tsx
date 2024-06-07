@@ -1,0 +1,127 @@
+import axios from "axios";
+import fs from "fs"
+import {
+  CompanyBalanceSheet,
+  CompanyCashFlow,
+  CompanyCompData,
+  CompanyIncomeStatement,
+  CompanyKeyMetrics,
+  CompanyProfile,
+  CompanySearch,
+  CompanyTenK,
+  CompanyHistoricalDividend,
+  Dividend,
+} from "./company";
+
+export interface SearchResponse {
+  data: CompanySearch[];
+}
+
+const api_keys = [
+  "vyARzkPDScpUMqtGltySIWPhm2DIWcqx","o7Uzgnm1rRH0GQYG80gudgQzy74unJY4","V3ZuuDAYMSEymALXljASepsUQu5b8Llm","ax4g7CxXoo3lrSZJgdLynW4sfnxdzG0x","iG7ObrxWaK8OuLRPIuTIeqe9MdfNw7hz","6e1TDjTxJSgmf46nVgUnjSLECP0YYQgE","xbkXzcDzu52jTfCMAJtpHAZETmeQfCXo","dp699q4rgBt3MUjlxONiwgTqWhwwgnfv","ZSTOj7gXjpAJOHfsAD4aSBRXUi6OHHek","LEmkoAMoxJ903XME8ijaH8p4bdVw0Mdc","qqbST3JY6E1arsN2egnakRSBexGXRma9","TMinoBVOqtZyzspLlBSAT0UmlmlYrCO5","LYTs0KGoLzgouOt3yec8nNeB9HEKpz9E","vbZ1x7OuX9eR1IZdf9JyYL0cAd1AlxrW","sc8L1Kspva2HsxJPOGSCHH4u7BNyZVMJ","ZWQAj5gRkza6PD6UZMwCxOzEqDVhBtnC","AaF35KKi3uMeLJ9ac0vWacCECkeGciwj","ui05M2aBZAebqanQvwAsSU2mHJzrjova","V0em6fyxnynZMuyR09LvHEPz30SG8hp7","HMSHy9pyMejraON8Iv3TPHA7w1HgPTiw","IyKV0kS5aVHBoKA83Wmc2RyyqaTpbRl2","etKmbzxZavchR0yN8tbseQcLE9pWDppW","8Qn7gZQR2vHjjzkjt1k4F6WNAclvDXCM","tJE3ghsRCJXeHd4TYipNOx9MDZpncWYi","INcAu5jMaCTwo4CRTsNoalI7FL4H2bC2","TpJRRirnE6ICx5DvjLxkQ2UduWU6YjUd","bMygVeRGS2DbqpixNvaSA0xcxBGCr0Ku","9rjkgFIWJuYhHfw0zEG3U7D0Qe3dOLKe","FagiUrzlrnVo6pqN80Rp890YGYKFKqlK","Xo0MyNQmi0Cv9Ah6kKZDCefpJtndGHWv","2XTEPgAC5QkzISMn2ZzYzl4AwHrnGhjl","tRv9tBtgxTp5DTtNkErpJPXfqvJmWo5o","R9gmnVwzEELTykcYMGIiD8Ui8aD5n3Ic","LCkO4hdsQRAwvQsxErC8kGYT8b2IwwBz","PxpwlFR7JUe4rZibbwAqq7WZss9Cp05s","3JlW3MrPwTuqiG1XfAQIHeBQRCGvukBX","pA4FpBB6amLOZqmzf4veAWfLS6MXa63X","pT2rLzbLS5UhZfKpQ7c3Qe47MqnSvDQV","qddv3cwtwbP65f6AR61Oub9005SFxnOj","nFulBChYARCi6gU47kZBs2oEIuLC3nA6","qAMvf8Th9Y2LF8EM4FfieS49p9mYfWNP","dzzs6ZBsDFK1MHDZ6kdGBWXB9YFjKoSy","ChxGpi80urEEwxfhJxXkBDHFCirEqGnv","PVvQhAvzifLrIKwR6lgQwrOlhoufsh3y","2CIxkXpeSIhWbToq2kR1sD01Y9aqovDO","CwoPGllH605FtE3DwcpHWan6OTg83fP0","AyA2AQY7JYPPhdZzxv6624vwMvwHqgFr","nnUa9VXFCqrhRsdbRNnwM1TVVLReXpCz","q7gv20djGoIusqyJWhU9YD8YYJA5SYce","ORf9PHJL7mo4rtjrcElFLDeMhlj76ldt","8DJfxBm8DPdxX7EFOOPuEmug9Vd3uKtV","m31S4O94fZAINtZ4fDq1IMf7gxpyuqCz","Lg5AYQKRBYUVvdvTbhFp6ADUJDkACjcH","mmkHPfN6qiwMSotYh6ZqG7x2OTf48x5O","amvzBTLY7CwlqvGdBBDStmMkFEGctWCC","WOlnpPfLfJkfSkkcCvtCv0XzLS1E45KZ","pZViEfMAzC9xRbgyqR6vGut99WsWm2KG","i8YLwjvBYe1DgDNp1uuD1OvcH60qj9FP","wvtBuMihVOlp00Eml64g4PqsipjShaub","AJZ0NpHYeV9iBc4xOokq3scVQoYfD5Cw","WmL0L8IN2HrJLuVRqYOZqKRR2VErkrNZ","KbjiL8AT14caODsjDrept0hUzpGDUdDF","OitFieGQmVkT09jPbuFNR5GrgfoZ4v9x","NXwbjYcm1LrA4ZBUdUlPIBRq4KPn1dkW","ycrCUTdwoq81B8tD44XANKUpJ8DH4PrJ","d5xYApE6drjMhH7yqIuO4iHLQjaiCbsV","8XHalMOcFmKlQO6ErOuvsESagJlz9cyj","7U2HV2TtyqLmH9xlhwte8fT6qQNhuBE7","QGgep89GfUBVVx5HlN5B2u2O3lw1fdAj","iI9KZzwinhbEkCbjpe6JOxm1IH4JHddE","6lxwJ7aVdZ1XH1dFSblZFsDXTFoUERLr","FheM1qMaWvvwPamEV8NtgGzO2GMz9Vrq","sqw33k7f99zirmlUNosJSUFemZuIK4nS","INOpJP98sUQKRobhWoWhYTQHZnHho5gK","PGU0Pw8l0NsbXaaw2oqo4JAcpqmZARD2","MXw1pn5oFEGfS0rnvLvbakCgQNily8PP","NToLoYZ83mwTLkYbuOttgnTwmFaBgn1B","dcqTlNA1lWy04KqXjRHF2rSN3azmF7Sx","UaAu599SGV3RHOy3H06CK6OTNst9AJMM","5bWUxCTmGrMfmtEgQJ32lZzr6Fl8MD8j","QJAEPFQMtYqsUPWnvlf0KmSzkOTZDGg0","yLWvEPZE6mSROdRXC4LKPNsoKHUtxPkd","1SPLZ86nKrSfqIIf04lGpDcSTJCefUM7","kg2hHepIfBTB4oYgVDXqRd2HNzhkYMNN","5OP4ZktnZc1sezcvNk8r3Txu4Nu9beY1","5drDx0Q4eQ5Ku28H1YfiDBDTY87JQHqI","JppswytENBiAnDAfBIp3aNzds7bsqyyh","jfoKnCrzfnvBTKO08zqwtmkkaaeLodS3","H1KcUHOEecLJqKPSrMFARSKgnj605mmq","SmaEPwVO1vavoL4mW0nDq6ez7ol4H7c7","vbH4TpqvFVWblI7waQcWR2uOOmWOqVE3","QXOCFQ2gtO5JjdSgQe1iZbEQzMtmjA63","RokaRiACVcQKFImaSZtTY9msuDh4HXCl","kDKBmu35ofHnDxvEYtDmZckuOUgnkz6z","e1hp3K0o6jFX7toj1T8Jp5GnjUfb62zc","f9uiRa75IJFjx5cPqS0xp9DbI4BmTW50","h75up0TClIWWc4qVFB3pZr4JsA651qOj","RhA2n6HzIzBtTiuCEwd8oS3qmFCbfmej","IlLnLjMg22vPS0ASjoZFhwsJ6EdvIFHW","phjdBfiEs8QqvHTOt4Mg3Ebuopw13CPa","O7XYn3seDWduWcmVA6iP1XKKxYDNhzW3","hzxOQ19ZoQlcV1RlOKVqcZg2YQf8CrxP","pse2GAyuc6FrQjdorfmq259nLqCax8IQ","NCIsjuPwF96BRLemueB1npp6wGUb8ns6","40TJcmJlRZS3kPE4THv5oMY2iZsMgbXp","9AF96So4zdp2BxmQQCLM655afib6D3hG","3zdlJEcKby3hubTTzbWV9R2B50NTkH7j","I09SR5DK7lN5JBKcGZSGlBZMhQZlRFgj","iydbYFRpnYHtlO2M4hOmAZYAa9DSVSVf","iIOqYohjWdWErfobL1vj9MLXxrUQdXPU","Im8ksmI4c2ou42Zn5hX9m25wIWG9pVek","MWaVPFvCLuqPiRPZGifdxnJc23QScuzI","v3zGFOURZQ0xQD9PXbqH8ERCPovTjFHJ","igNS6Hm9dkFNr8gR7OETJzEweRLpJM6M","eBOFOi5PTGo3GdOcbctYdvT9uQR2T33T","GuK9DHhOTChutihN18H9BLfR9unUPqYX","jic3GeuBDy4vu1xP41u2LFcN9JYUPBgF","Yb9c7ClfF3Ce20nbv6aSFq2wIWrGTHWA","1AWbwBkuw2wLquOWjCxjcgDDlveSHtbn","GlnSNg9wjJous00SrNiWz6dDsnEIU6WO","zZYK60dQOTowkYO319MG3SQdJZVT7tjS","haScfQvtqh5LNrsYuscmUhjBrXkzF5QW","hAp1ynUuDsBnJJoQaAzx7TKabWDkzCIQ","g5G86MwjXRxr14zJEb68SGfCtAzyX6Na","3AHuk84GbDIr8835xrqwN8wgIlihF9cz","e6jpc8KwwhY3pH38gRylTbNiP7sWdYGY","ckXdEdPJXxOyKOwSGno2UjykfxQf9SP1","COmW3QXwgl016puFfdtJdxPS5euxAZDo","uLw3OzURHOSyNG3wn6rqEnqRYTRJdsiX","oO4lJRtLVMDOOu9UvfajUPqV5DuwC6NL","b102B1IEo1rMjSGHd2RQjMeTIoPCIYhe","dLZgdAijpWWbm5wn4AcoqzYnLVBa9EJB","e4Nue5c6Y3RVi95e4PclqxqM0BYLVwKj","8HihSbAhb22K0tw8OHoSWKh4atF5dMFA","ZKAZOL80AEriKv1dKxJl5wpaNKwcSbIj","JNVJLQyo6YXuL9NdYf5yJOhAn5v9EUrr","IuAqpVc5WtE5R2kiHhxFlQXZ9J5e6RVY","NbeblMkU4N59GqtqoDJtpsJGANIxsJTK","R8Se5Dx0orRoROmBFwJsho8x3oQXUx9r","wwVbrCrPRq6A32WbdFD0OyjmYnNi5fB5","oLz0NXjbaac4N4LOisxjjPRgj5vBMbPG","NePYZKlEqRCxuMQ4X21EtnTvzzWe6pnW","rCp5YjPJPWiIDlKBgkVp7CgnabK2plQx","1EI1X62AKxXErsraYXCF8Q2pzfSWbA31","2q4wxpDyW16R02b5fIGlpgQSG2tn2l1B","tCWPIwx0X40BHXfr1PmxGfEH2cCy1ZML","AHdKEvReULvtdJAHOBhXVpfJH9jgoPF6","TY8RqUN9j957eLVUfssx4yWSBjZX8U26","F2KKm4WFD4axYj9NjlALP5epJt7T2kbN","qSiE5W2OJAJMF3KhFHahZTm45SQZdv9n","JquEdjpAKfJ3NXwx0vH1Mjoa4OAtbsC1","IMky0X0apB3WLkQgUbcBXXmJfIOdyOZn","gib6t5F6BRF3jRvrkmXFvYhJMKawe1Dl","z3rJMxc3J8rbpQXCeR2Ptmv0OQv1MiWn","xaf249ox7guCFddI6e6xpSQViwNNsxLN","IpcNZSEwZYxqQdEWkQVNgDQA3jaOXUwT","ks63GWAMAaQAu4K3ZzQ319RIqDt2AaOX","KYW16ThziLLlEcSGSG6gZ8kXXK32HXmI","Lii3D2bNZuBBUx0BQ2iTzLekygaL1J2v","9nu0qgYFaXvOzUeQpLj598i74Ljhp9xm","2vUjfJUcuk0N8hJMAf2DdfJkCu66u3H4","ZSITuAODOYVoeGIX9TMPKLfhX7i2UqrC","TLlgu5GkU7OzIwmuMhjZJ2JdO6TKBhQQ","NPD5gGwOM27TMMZK5BukOwafBDPgk48I","OxAnT4Gux1IYwIVvtk9tx1vhXZJW3u4l","aSaJOuRco3096CCZwfii8pjsqqs5YMVy","2Rf3sEjKXjiZ7x4VmTDyCMcViA6ugXIw","skdj1QA02dQYhdTkDpJvxtPBRG0tD4LR","0NtDq97VfC5yXhcAY1dbAtNXRhQflo9y","caC8zSiMVrECXJbwQX5csm1dyFgwmzuS","yhQPgF4qoxj9yNYfJal9CxdSAwH5qAjf","HLSWOQpwxlQQkDI4rl3OfQPiJmFTWbw0","jSgxYseMDyeUsjDDQUtsjN1e1iGSHqHF","MVlsgsPHDjGj6lurJmRex96VFV2WsIDV","X75yW3YcZkU08xVkThxmq9iM8oddTjhN","eBtSpaU18miu3ZIJCWWViNQWE47wkem1","RuRHDaozJLvAR7R57DUIcEYqNBOLP4pe","X0yWrH5rgUSq5scPRkcZcxDvpiclT9im","OAnABdCz49yRhcSsVuwwiLRZQ6Pxaki3","vKoFO8NasHX0sTSosrjN7S5f5cIXpXHW","ywlRHIBVLf4UQgVhyCVMpE3XDt8kQ5S3","MD1KwKKUOZBpxeLNOfhbWDPw4RJIqVEt","XR7n5hKTfjLmgYqzy54FOH0C0V2DvnSl","J6emKc91xrgLVk7aNjvb9w5kPRUv77zR","u48PsrlIViUbvNJ0htMP3tb5HzHntlF5","ZazXpSiuGK7d6C1DhlaLDTkIuWLgLYZx","EZnRuiO4tQDzsmkbdo8Kg7kCGQQgR0LP","i0m10N8Qw7xBxQLfR06WGZsIrwxeIzam","TPpfigYNJ5cP3CgwgkvSyqjf1pZtI2uR","694Onf7M4KlQS8arTF95xLtoajM1GFWI","PAZEFrXQzRb2cwgiKWSttXba8cxMzc4L","YooHR5q3k0J6ikMQleSvdgFVdUPoLjVJ","XQqvl9Gs4KGvvovurbgB8C0JbMuQmYr8","b3PSbaAwwxCHmaCKmzREUB2vDTO7ff1v","6mFqTxCDi406ttZeD7IwkxyYQFaEikVq","h3QfiOlRVPQW2hVOjqEICaz9n8ilLhxF","g2avR49XjkC4Wy7aDD8iepv2ctFDyIKK","w9KniR9gY4nJMOTogvSHepxGWmGUYeiR","dQKph8dbyQxUtn4hx4rRWSOwyYjte85R","ElgvZTBaMeUIt6qQ8lMOGKrrOwIOZHNZ","YoYv3YZanw44ZssI8DPdG53cbs5RNJTd","CyFsCxcSDyPk31mzek35HTaoMkMjIQTe","Fv1SiEqzLsdxhBTbyFPsOwP2IhhJYc7Q","ymzfM7c3xOtxYfmtA0QpbjDqYuiw4uaR","SqEDLvvBl94fAqAyqAjawlGtYjUZJaiH","mUIkLo3iSucW3QCBKJKzLEoq3rHhEAT9","jVuiytjSCApG5uOIXfNRM3WOIul6DGjc","4QqCUOdb0syUSgfBrwtSmmY43HBJtqSL","Q52gUW0Y4bffBH2dYUADlIuuikjQXpPe","IGRzZcviQkrrVlYIMxmdBEufD23tkUgT","QL8IgkyqlahI2qVZVaI4Ofb0jh5sFImG","JTTsIiyGKwgilMw1OFMvNoA5FCWacZVV","YOQywHF6tuPfZ8EtT1EBY8RTQD415bRe","G1eAGR5h4gp49dFlqz4e4tGwFx73aWBh","jvTm7Oei2HRC8PE3WeS1tzSFjvbKY21L","gBctFSzUvzu00iuEdZPkPj2jYstEQNhN","KvjMvBeeGUe7xk918bGEjDLUurZJTUJC","uF9yx2JSj53q0fgYMu8L96frl5vLpCpu","VKGYNK7tUGHNR3u9ZKDsqQDcQ7cdwOnD","CzDT6988fCoW7EfaOeXBQ1dZuvDyUumE","EMXI3TeKJ0IaqUceWqZvPXENGSI4lk9C","pyhGtUIe0hhXJ0rhyARNaLC9LEjs8uGd","hBDjIqwMGtNn8rcRdP5Uk8bQaXkMHttr","47JzBmqMahoQaGMA0kJziP3sEFy0C4sc","Hya8uEAiZryjTrez3lkPT5LtLfH04iWx","Ah4wps0nmPnpzXlUB158QryeTuU22yEa","tmHJI3wJWnphc24250JZC2uld9nidIZi","udYvZX1eo2CMWL25QQ4vO5ATmlibaCr3","RXbLTiR63XXZDtLUP3HmIlK1IUARzPCb","5i0pS9Qbh8ui3Ha2prkMpndNJ9pGauzl",
+]
+
+export const searchCompanies = async (query: string) => {
+  try {
+    const data = await axios.get<SearchResponse>(
+      `https://financialmodelingprep.com/api/v3/search?query=${query}&limit=10&exchange=NASDAQ&apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+    );
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log("error message: ", error.message);
+      return error.message;
+    } else {
+      console.log("unexpected error: ", error);
+      return "An expected error has occured.";
+    }
+  }
+};
+
+export const getCompanyProfile = async (query: string) => {
+  try {
+    const data = await axios.get<CompanyProfile[]>(
+      `https://financialmodelingprep.com/api/v3/profile/${query}?apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+    );
+    return data;
+  } catch (error: any) {
+    console.log("error message: ", error.message);
+  }
+};
+
+export const getKeyMetrics = async (query: string) => {
+  try {
+    const data = await axios.get<CompanyKeyMetrics[]>(
+      `https://financialmodelingprep.com/api/v3/key-metrics-ttm/${query}?limit=40&apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+    );
+    return data;
+  } catch (error: any) {
+    console.log("error message: ", error.message);
+  }
+};
+
+export const getIncomeStatement = async (query: string) => {
+  try {
+    const data = await axios.get<CompanyIncomeStatement[]>(
+      `https://financialmodelingprep.com/api/v3/income-statement/${query}?limit=50&apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+    );
+    return data;
+  } catch (error: any) {
+    console.log("error message: ", error.message);
+  }
+};
+
+export const getBalanceSheet = async (query: string) => {
+  try {
+    const data = await axios.get<CompanyBalanceSheet[]>(
+      `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${query}?limit=20&apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+    );
+    return data;
+  } catch (error: any) {
+    console.log("error message: ", error.message);
+  }
+};
+
+export const getCashFlow = async (query: string) => {
+  try {
+    const data = await axios.get<CompanyCashFlow[]>(
+      `https://financialmodelingprep.com/api/v3/cash-flow-statement/${query}?limit=100&apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+    );
+    return data;
+  } catch (error: any) {
+    console.log("error message: ", error.message);
+  }
+};
+
+// export const getCompData = async (query: string) => {
+//   try {
+//     const data = await axios.get<CompanyCompData[]>(
+//       `https://financialmodelingprep.com/api/v4/stock_peers?symbol=${query}&apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+//     );
+//     return data;
+//   } catch (error: any) {
+//     console.log("error message: ", error.message);
+//   }
+// };
+
+export const getTenK = async (query: string) => {
+  try {
+    const data = await axios.get<CompanyTenK[]>(
+      `https://financialmodelingprep.com/api/v3/sec_filings/${query}?type=10-K&page=0&apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+    );
+    return data;
+  } catch (error: any) {
+    console.log("error message: ", error.message);
+  }
+};
+
+export const getHistoricalDividend = async (query: string) => {
+  try {
+    const data = await axios.get<CompanyHistoricalDividend>(
+      `https://financialmodelingprep.com/api/v3/historical-price-full/stock_dividend/${query}?apikey=${api_keys[Math.floor(Math.random()*api_keys.length)]}`
+    );
+    return data;
+  } catch (error: any) {
+    console.log("error message: ", error.message);
+  }
+};
