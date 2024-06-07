@@ -2,7 +2,7 @@ import axios from "axios";
 import { PortfolioGet, PortfolioPost } from "../Models/Portfolio";
 import { handleError } from "../Helpers/ErrorHandler";
 
-const api = "http://stonks.anal.studio/api/portfolio/";
+const api = "https://stonks.anal.studio/api/portfolio/";
 
 export const portfolioAddAPI = async (symbol: string) => {
   try {

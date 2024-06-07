@@ -2,7 +2,7 @@ import axios from "axios";
 import { handleError } from "../Helpers/ErrorHandler";
 import { UserProfileToken } from "../Models/User";
 
-const api = "http://stonks.anal.studio/api/";
+const api = "https://stonks.anal.studio/api/";
 
 export const loginAPI = async (username: string, password: string) => {
   try {

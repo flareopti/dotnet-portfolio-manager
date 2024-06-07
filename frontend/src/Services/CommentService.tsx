@@ -2,7 +2,7 @@ import axios from "axios";
 import { CommentGet, CommentPost } from "../Models/Comment";
 import { handleError } from "../Helpers/ErrorHandler";
 
-const api = "http://stonks.anal.studio/api/comment/";
+const api = "https://stonks.anal.studio/api/comment/";
 
 export const commentPostAPI = async (
   title: string,
